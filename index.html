@@ -1,0 +1,1527 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CraveBite | Swiggy & Zomato Inspired Food Ordering</title>
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍔</text></svg>" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Cabinet+Grotesk:wght@700;800;900&display=swap"
+    rel="stylesheet" />
+
+  <!-- Font Awesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="styles.css?v=3.0" />
+
+  <!-- Confetti script -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" defer></script>
+</head>
+
+<body>
+
+  <!-- Top Strip: Location, Gold Pass, Currency, Dark Mode -->
+  <div class="top-nav-strip">
+    <div class="container top-nav-flex">
+      <div class="top-nav-left">
+        <div class="location-pill" id="locationTrigger" title="Click to change location">
+          <i class="fa-solid fa-location-crosshairs loc-icon"></i>
+          <div class="location-text-group">
+            <span class="loc-landmark" id="currentLandmark">Indiranagar</span>
+            <span class="loc-address" id="currentFullAddress">100 Feet Rd, Bengaluru, Karnataka</span>
+          </div>
+          <i class="fa-solid fa-chevron-down loc-chevron"></i>
+        </div>
+
+        <div class="gold-pass-pill" id="goldPassPill">
+          <i class="fa-solid fa-crown gold-crown"></i>
+          <span><strong>CRAVE GOLD:</strong> Unlimited FREE Delivery</span>
+        </div>
+      </div>
+
+      <div class="top-nav-right">
+        <!-- Currency Badge (Indian Rupees ₹) -->
+        <div class="currency-badge" title="Currency: Indian Rupees (₹)">
+          <span class="curr-symbol">₹</span>
+          <span class="curr-code">INR</span>
+        </div>
+
+        <!-- Sound Toggle -->
+        <button class="sound-toggle-btn" id="soundToggleBtn" title="Toggle Sound Feedback">
+          <i class="fa-solid fa-volume-high"></i>
+        </button>
+
+        <!-- Theme Toggle -->
+        <button class="theme-toggle-btn" id="themeToggleBtn" title="Switch Theme">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+
+        <!-- Past Orders Quick Link -->
+        <button class="top-orders-btn" id="myOrdersBtn">
+          <i class="fa-solid fa-clock-rotate-left"></i>
+          <span>My Orders</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Navigation Header (Swiggy / Zomato inspired) -->
+  <header class="site-header" id="header">
+    <div class="container header-container">
+      <!-- Brand Logo -->
+      <a href="#" class="brand-logo">
+        <div class="brand-badge">
+          <i class="fa-solid fa-utensils"></i>
+        </div>
+        <div class="brand-names">
+          <span class="brand-main">crave<span>bite</span></span>
+          <span class="brand-sub">INSTANT DELIVERIES</span>
+        </div>
+      </a>
+
+      <!-- Primary Service Switcher (Delivery vs Dining vs 10-Min QuickBite) -->
+      <nav class="service-tabs" id="serviceTabs">
+        <button class="service-tab active" data-tab="delivery">
+          <div class="service-tab-icon"><i class="fa-solid fa-motorcycle"></i></div>
+          <div class="service-tab-text">
+            <strong>Delivery</strong>
+            <small>Hot & fresh at home</small>
+          </div>
+        </button>
+        <button class="service-tab" data-tab="dining">
+          <div class="service-tab-icon"><i class="fa-solid fa-wine-glass"></i></div>
+          <div class="service-tab-text">
+            <strong>Dining Out</strong>
+            <small>Book tables & offers</small>
+          </div>
+        </button>
+        <button class="service-tab" data-tab="quick">
+          <div class="service-tab-icon"><i class="fa-solid fa-bolt"></i></div>
+          <div class="service-tab-text">
+            <strong>10-Min Fast</strong>
+            <small>Snacks & Munchies</small>
+          </div>
+        </button>
+      </nav>
+
+      <!-- Search Bar with Animated Placeholder -->
+      <div class="search-container">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input type="text" id="searchInput" placeholder="Search for 'Biryani'..." autocomplete="off" />
+        <button class="clear-search-btn" id="clearSearchBtn" title="Clear search" style="display: none;">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Header Action Buttons -->
+      <div class="header-actions">
+        <!-- Offers / Coupons Pill -->
+        <button class="action-pill offers-pill" id="offersTriggerBtn">
+          <i class="fa-solid fa-percent"></i>
+          <span>Offers</span>
+          <span class="sub-discount-tag">NEW</span>
+        </button>
+
+        <!-- User Authentication / Profile Pill -->
+        <div class="auth-wrapper" id="authWrapper">
+          <button class="action-pill auth-pill" id="authTriggerBtn">
+            <i class="fa-regular fa-user"></i>
+            <span id="authPillText">Sign In</span>
+          </button>
+
+          <!-- User Dropdown Menu (Visible when logged in) -->
+          <div class="user-dropdown-menu" id="userDropdownMenu" style="display: none;">
+            <div class="user-menu-header">
+              <div class="user-avatar-circle" id="userAvatarChar">R</div>
+              <div class="user-info-text">
+                <strong id="menuUserName">Rahul Sharma</strong>
+                <span id="menuUserPhone">+91 98765 43210</span>
+                <small id="menuUserEmail">rahul@example.com</small>
+              </div>
+            </div>
+            <div class="user-menu-divider"></div>
+            <button class="user-menu-item" id="menuMyOrdersBtn">
+              <i class="fa-solid fa-clock-rotate-left"></i> My Orders
+            </button>
+            <button class="user-menu-item" id="menuOffersBtn">
+              <i class="fa-solid fa-tag"></i> Coupons & Offers
+            </button>
+            <button class="user-menu-item" id="menuGoldBtn">
+              <i class="fa-solid fa-crown text-gold"></i> Crave Gold VIP
+            </button>
+            <div class="user-menu-divider"></div>
+            <button class="user-menu-item logout-btn" id="logoutBtn">
+              <i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out
+            </button>
+          </div>
+        </div>
+
+        <!-- Favorites Badge -->
+        <button class="action-icon-btn" id="favoritesBtn" title="Your Favorites">
+          <i class="fa-regular fa-heart"></i>
+          <span class="counter-badge" id="favBadge">0</span>
+        </button>
+
+        <!-- Cart Button -->
+        <button class="cart-pill-btn" id="cartTriggerBtn">
+          <div class="cart-icon-box">
+            <i class="fa-solid fa-bag-shopping"></i>
+            <span class="cart-count-badge" id="cartBadge">0</span>
+          </div>
+          <div class="cart-pill-info">
+            <span class="cart-label">Cart</span>
+            <span class="cart-amt" id="headerCartTotal">₹0</span>
+          </div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Search Row -->
+    <div class="mobile-search-strip container">
+      <div class="search-container">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input type="text" id="mobileSearchInput" placeholder="Search dishes, restaurants or cuisines..." />
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Banner Strip (Swiggy Deals & Rotating Carousels) -->
+  <section class="hero-offers-strip">
+    <div class="container offers-carousel-container">
+      <div class="deal-banner banner-orange">
+        <div class="deal-content">
+          <span class="deal-tag">ZOMATO & SWIGGY DEAL</span>
+          <h2>FLAT 50% OFF</h2>
+          <p>On your favorite Biryanis, Pizzas & Burgers. Free Delivery over ₹299.</p>
+          <div class="deal-code">Use Code: <strong>CRAVE50</strong></div>
+        </div>
+        <img src="https://images.unsplash.com/photo-1589302168068-964664d93dc0?auto=format&fit=crop&w=450&q=80"
+          alt="Biryani Feast" class="deal-img" />
+      </div>
+
+      <div class="deal-banner banner-purple">
+        <div class="deal-content">
+          <span class="deal-tag">CRAVE GOLD EXCLUSIVE</span>
+          <h2>BUY 1 GET 1 FREE</h2>
+          <p>Gourmet Burgers, Momos and Chilled Artisan Shakes.</p>
+          <div class="deal-code">Code: <strong>BOGOFOOD</strong></div>
+        </div>
+        <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=450&q=80"
+          alt="Cheesy Burger" class="deal-img" />
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 1: "What's on your mind?" (Swiggy Circular Craving Carousel) -->
+  <section class="cravings-section">
+    <div class="container">
+      <div class="section-title-row">
+        <div>
+          <h2 class="swiggy-heading">What's on your mind?</h2>
+          <p class="swiggy-subheading">Choose your craving and get it delivered in 25-30 minutes</p>
+        </div>
+        <div class="carousel-nav-buttons">
+          <button class="scroll-arrow" id="scrollCravingsLeft"><i class="fa-solid fa-arrow-left"></i></button>
+          <button class="scroll-arrow" id="scrollCravingsRight"><i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+      </div>
+
+      <div class="cravings-carousel" id="cravingsCarousel">
+        <div class="craving-circle active" data-category="all">
+          <div class="circle-img-wrap">
+            <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=180&q=80"
+              alt="All" />
+          </div>
+          <span>All Foods</span>
+        </div>
+
+        <div class="craving-circle" data-category="biryani">
+          <div class="circle-img-wrap">
+            <img src="https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=180&q=80"
+              alt="Biryani" />
+          </div>
+          <span>Biryani</span>
+        </div>
+
+        <div class="craving-circle" data-category="pizza">
+          <div class="circle-img-wrap">
+            <img src="https://images.unsplash.com/photo-1604382355076-af4b0eb60143?auto=format&fit=crop&w=180&q=80"
+              alt="Pizza" />
+          </div>
+          <span>Pizza</span>
+        </div>
+
+        <div class="craving-circle" data-category="burgers">
+          <div class="circle-img-wrap">
+            <img src="https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=180&q=80"
+              alt="Burgers" />
+          </div>
+          <span>Burgers</span>
+        </div>
+
+        <div class="craving-circle" data-category="north-indian">
+          <div class="circle-img-wrap">
+            <img src="https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=180&q=80"
+              alt="North Indian" />
+          </div>
+          <span>North Indian</span>
+        </div>
+
+        <div class="craving-circle" data-category="chinese">
+          <div class="circle-img-wrap">
+            <img src="https://images.unsplash.com/photo-1525755662778-989d0524087e?auto=format&fit=crop&w=180&q=80"
+              alt="Chinese" />
+          </div>
+          <span>Chinese & Momos</span>
+        </div>
+
+        <div class="craving-circle" data-category="rolls">
+          <div class="circle-img-wrap">
+            <img src="https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&w=180&q=80"
+              alt="Rolls" />
+          </div>
+          <span>Kathi Rolls</span>
+        </div>
+
+        <div class="craving-circle" data-category="south-indian">
+          <div class="circle-img-wrap">
+            <img src="https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=180&q=80"
+              alt="Dosa" />
+          </div>
+          <span>South Indian</span>
+        </div>
+
+        <div class="craving-circle" data-category="desserts">
+          <div class="circle-img-wrap">
+            <img src="https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=180&q=80"
+              alt="Desserts" />
+          </div>
+          <span>Cakes & Ice Cream</span>
+        </div>
+
+        <div class="craving-circle" data-category="shakes">
+          <div class="circle-img-wrap">
+            <img src="https://images.unsplash.com/photo-1572490122747-3968b75cc699?auto=format&fit=crop&w=180&q=80"
+              alt="Shakes" />
+          </div>
+          <span>Beverages</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 2: "Top Restaurant Chains in your area" (Zomato & Swiggy Cards) -->
+  <section class="top-chains-section">
+    <div class="container">
+      <div class="section-title-row">
+        <div>
+          <h2 class="swiggy-heading">Top Restaurant Chains in <span id="chainsCityName">Bengaluru</span></h2>
+          <p class="swiggy-subheading">Featured verified outlets with top hygiene and fast delivery</p>
+        </div>
+        <div class="filter-pill-badges">
+          <button class="toggle-restaurant-filter active" data-rest-filter="all">All Outlets</button>
+          <button class="toggle-restaurant-filter" data-rest-filter="fast">Fast (< 30 min)</button>
+              <button class="toggle-restaurant-filter" data-rest-filter="pure-veg">Pure Veg</button>
+              <button class="toggle-restaurant-filter" data-rest-filter="rating">Rating 4.5+</button>
+        </div>
+      </div>
+
+      <!-- Restaurant Cards Carousel / Grid -->
+      <div class="restaurants-grid" id="restaurantsGrid">
+        <!-- Injected via JavaScript -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 3: Dishes with Online Food Delivery (Zomato/Swiggy Menu with Accordions & Veg/Non-Veg Switches) -->
+  <section class="dishes-menu-section" id="dishesMenuSection">
+    <div class="container">
+      <div class="menu-section-header">
+        <h2 class="swiggy-heading">Restaurants with online food delivery</h2>
+        <p class="swiggy-subheading" id="menuSubheading">Handcrafted meals prepared live on order</p>
+      </div>
+
+      <!-- Craving Filter Banner (Displays which craving is selected with a 1-click reset) -->
+      <div class="craving-active-banner" id="cravingActiveBanner" style="display: none;">
+        <div class="craving-banner-left">
+          <i class="fa-solid fa-utensils"></i>
+          <span>Showing dishes for: <strong id="activeCravingTitle">South Indian</strong></span>
+          <span class="active-craving-count-badge" id="activeCravingCount">0 dishes</span>
+        </div>
+        <button type="button" class="clear-craving-filter-btn" id="clearCravingBtn">
+          <span>Show All Cuisines</span>
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Swiggy Sticky Filters Toolbar -->
+      <div class="swiggy-toolbar" id="swiggyToolbar">
+        <!-- Veg / Non-Veg Toggle Filter Switch (Iconic Indian FSSAI markers) -->
+        <div class="veg-toggle-wrapper">
+          <label class="switch-veg" title="Filter Pure Vegetarian dishes">
+            <input type="checkbox" id="vegFilterToggle" />
+            <span class="veg-switch-slider">
+              <span class="veg-symbol-icon"></span>
+            </span>
+            <span class="veg-switch-label">Pure Veg</span>
+          </label>
+
+          <label class="switch-nonveg" title="Filter Non-Veg dishes">
+            <input type="checkbox" id="nonVegFilterToggle" />
+            <span class="nonveg-switch-slider">
+              <span class="nonveg-symbol-icon"></span>
+            </span>
+            <span class="nonveg-switch-label">Non-Veg</span>
+          </label>
+        </div>
+
+        <div class="swiggy-filter-pills">
+          <button class="sw-pill" id="bestsellerPill">
+            <i class="fa-solid fa-award"></i>
+            <span>Bestseller</span>
+          </button>
+          <button class="sw-pill" id="spicyPill">
+            <i class="fa-solid fa-pepper-hot"></i>
+            <span>Spicy 🌶️</span>
+          </button>
+          <button class="sw-pill" id="ratingPill">
+            <i class="fa-solid fa-star"></i>
+            <span>Rating 4.5+</span>
+          </button>
+        </div>
+
+        <!-- Sort dropdown -->
+        <div class="sw-sort-box">
+          <i class="fa-solid fa-arrow-down-short-wide"></i>
+          <select id="dishSortSelect">
+            <option value="relevance">Sort by: Relevance</option>
+            <option value="rating">Rating: High to Low</option>
+            <option value="delivery-time">Delivery Time: Fastest</option>
+            <option value="cost-low">Cost: Low to High</option>
+            <option value="cost-high">Cost: High to Low</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Dish Listing grouped by Swiggy Accordions -->
+      <div class="menu-accordions-container" id="menuAccordionsContainer">
+        <!-- Injected via JavaScript (Recommended, Starters, Main Course, Biryani, Desserts) -->
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-dishes-state" id="emptyDishesState" style="display: none;">
+        <div class="empty-food-icon">🍲</div>
+        <h3>No matching dishes found</h3>
+        <p>Try clearing your dietary filters or search query to see all available items.</p>
+        <button class="btn btn-primary" id="resetDishesFilterBtn">Reset All Filters</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sticky Bottom Floating Cart Bar (Appears when items are in cart - Exactly like Swiggy & Zomato) -->
+  <div class="sticky-cart-bar" id="stickyCartBar" style="display: none;">
+    <div class="container sticky-cart-inner">
+      <div class="sticky-cart-left">
+        <div class="sticky-cart-count">
+          <span id="stickyItemCount">1 Item</span>
+          <span class="dot-separator">•</span>
+          <span class="sticky-cart-price" id="stickyCartPrice">₹249</span>
+        </div>
+        <small class="sticky-cart-savings" id="stickySavingsText">Extra ₹50 OFF applied via CRAVE50</small>
+      </div>
+
+      <button class="sticky-cart-btn" id="stickyCartBtn">
+        <span>VIEW CART & PAY</span>
+        <i class="fa-solid fa-arrow-right"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Live Order Floating Tracking Pill (Swiggy / Zomato Active Delivery Widget on Home Screen) -->
+  <div class="active-order-tracking-strip" id="activeOrderStrip" style="display: none;">
+    <div class="container active-order-strip-content">
+      <div class="active-strip-left">
+        <span class="live-pulse-dot"></span>
+        <div class="active-strip-rider-icon"><i class="fa-solid fa-motorcycle"></i></div>
+        <div class="active-strip-text">
+          <div class="active-strip-row1">
+            <span class="live-tag">LIVE DELIVERY</span>
+            <strong id="activeStripTitle">Order #CB-98214</strong>
+          </div>
+          <p id="activeStripDesc">Chef is preparing your food • Meghana Foods</p>
+        </div>
+      </div>
+      <div class="active-strip-right">
+        <div class="active-strip-eta">
+          <span id="activeStripEta">22</span>
+          <small>MINS</small>
+        </div>
+        <button class="btn-track-order" id="openActiveTrackerBtn">
+          <span>TRACK LIVE</span>
+          <i class="fa-solid fa-location-arrow"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Site Footer (Zomato/Swiggy Layout) -->
+  <footer class="swiggy-footer">
+    <div class="container footer-top-row">
+      <div class="footer-brand-box">
+        <a href="#" class="brand-logo footer-logo">
+          <div class="brand-badge"><i class="fa-solid fa-utensils"></i></div>
+          <span class="brand-main">crave<span>bite</span></span>
+        </a>
+        <p>Serving over 500,000+ happy meals every single day with the fastest contactless delivery across 50+ cities.
+        </p>
+        <div class="footer-social-icons">
+          <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+          <a href="#" aria-label="Twitter"><i class="fa-brands fa-x-twitter"></i></a>
+          <a href="#" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+        </div>
+      </div>
+
+      <div class="footer-links-col">
+        <h4>About CraveBite</h4>
+        <ul>
+          <li><a href="#">Who We Are</a></li>
+          <li><a href="#">Blog & News</a></li>
+          <li><a href="#">Crave Gold Pass</a></li>
+          <li><a href="#">Careers</a></li>
+          <li><a href="#">Report Fraud</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-links-col">
+        <h4>For Foodies</h4>
+        <ul>
+          <li><a href="#">Code of Conduct</a></li>
+          <li><a href="#">Community Guidelines</a></li>
+          <li><a href="#">Blogger Outreach</a></li>
+          <li><a href="#">Mobile Apps</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-links-col">
+        <h4>For Restaurants</h4>
+        <ul>
+          <li><a href="#">Partner With Us</a></li>
+          <li><a href="#">Apps for You</a></li>
+          <li><a href="#">Restaurant Dashboard</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-links-col">
+        <h4>Popular Cuisines</h4>
+        <ul>
+          <li><a href="#" class="footer-craving-link" data-cat="biryani">Hyderabadi Biryani</a></li>
+          <li><a href="#" class="footer-craving-link" data-cat="pizza">Wood-Fired Pizza</a></li>
+          <li><a href="#" class="footer-craving-link" data-cat="burgers">Crispy Burgers</a></li>
+          <li><a href="#" class="footer-craving-link" data-cat="north-indian">Butter Chicken & Naan</a></li>
+          <li><a href="#" class="footer-craving-link" data-cat="south-indian">Crispy Masala Dosa</a></li>
+          <li><a href="#" class="footer-craving-link" data-cat="chinese">Steamed Momos</a></li>
+          <li><a href="#" class="footer-craving-link" data-cat="rolls">Kolkata Kathi Rolls</a></li>
+          <li><a href="#" class="footer-craving-link" data-cat="desserts">Gulab Jamun & Waffles</a></li>
+          <li><a href="#" class="footer-craving-link" data-cat="shakes">Thick Mango Shakes</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom-row">
+      <div class="container footer-bottom-flex">
+        <p>&copy; 2026 CraveBite Technologies Pvt. Ltd. All rights reserved.</p>
+        <div class="legal-links">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms & Conditions</a>
+          <a href="#">Security</a>
+          <a href="#">FSSAI Lic. No. 10019022009823</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ================= SWIGGY / ZOMATO SLIDE-OUT CART DRAWER ================= -->
+  <div class="drawer-backdrop" id="cartBackdrop"></div>
+  <aside class="swiggy-cart-drawer" id="cartDrawer" aria-label="Your Order Cart">
+    <!-- Header with Outlet Name -->
+    <div class="drawer-header">
+      <div class="outlet-header-details">
+        <h3 id="drawerRestaurantTitle">Meghana Foods</h3>
+        <p id="drawerRestaurantLoc">Indiranagar, 100 Ft Road • Delivery in 25 mins</p>
+      </div>
+      <button class="drawer-close-btn" id="closeCartBtn" aria-label="Close cart">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <!-- Free Delivery Progress Pill (Gold style) -->
+    <div class="delivery-threshold-banner" id="deliveryThresholdBanner">
+      <i class="fa-solid fa-truck-fast"></i>
+      <span id="deliveryThresholdText">Add items worth ₹150 more to get <strong>FREE DELIVERY</strong></span>
+    </div>
+
+    <!-- SCROLLABLE DRAWER BODY (All content scrolls smoothly while footer stays firmly visible) -->
+    <div class="drawer-scroll-body" id="drawerScrollBody">
+      <!-- Ordered Items Container (Natural full-height listing, no tiny squished box) -->
+      <div class="drawer-items-section">
+        <div class="drawer-items-header-tag">
+          <span>ITEMS IN CART</span>
+          <span class="items-count-pill" id="drawerItemsCountPill">1 Item</span>
+        </div>
+        <div class="drawer-items-list" id="drawerItemsList">
+          <!-- Injected via JavaScript -->
+        </div>
+      </div>
+
+      <!-- Cooking & Delivery Instructions (Zomato/Swiggy hallmark feature) -->
+      <div class="delivery-instructions-box">
+        <h4><i class="fa-solid fa-bell-slash"></i> Delivery Instructions</h4>
+        <div class="instruction-chips">
+          <button class="inst-chip" data-inst="Avoid calling">
+            <i class="fa-solid fa-phone-slash"></i> Avoid calling
+          </button>
+          <button class="inst-chip" data-inst="Leave at door">
+            <i class="fa-solid fa-door-open"></i> Leave at door
+          </button>
+          <button class="inst-chip" data-inst="Don't ring bell">
+            <i class="fa-solid fa-bell-slash"></i> Don't ring bell
+          </button>
+          <button class="inst-chip" data-inst="Leave with security">
+            <i class="fa-solid fa-shield"></i> Leave with guard
+          </button>
+        </div>
+      </div>
+
+      <!-- Delivery Tip For Rider (Swiggy/Zomato feature) -->
+      <div class="rider-tip-box">
+        <div class="tip-header">
+          <h4><i class="fa-solid fa-heart tip-heart"></i> Tip your delivery partner</h4>
+          <small>100% of tips go directly to your rider</small>
+        </div>
+        <div class="tip-options" id="tipOptions">
+          <button class="tip-btn" data-tip="0">None</button>
+          <button class="tip-btn active" data-tip="20">₹20</button>
+          <button class="tip-btn" data-tip="30">₹30</button>
+          <button class="tip-btn" data-tip="50">₹50</button>
+          <button class="tip-btn" data-tip="100">₹100</button>
+        </div>
+      </div>
+
+      <!-- Coupon Box -->
+      <div class="drawer-coupon-box">
+        <div class="coupon-field">
+          <i class="fa-solid fa-tag coupon-tag-icon"></i>
+          <input type="text" id="drawerCouponInput" placeholder="Enter coupon (Try: CRAVE50)" uppercase />
+          <button class="apply-coupon-btn" id="drawerApplyCouponBtn">APPLY</button>
+        </div>
+        <div class="coupon-success-tag" id="drawerCouponAppliedTag" style="display: none;">
+          <div>
+            <strong id="appliedCouponTitle">CRAVE50 Applied!</strong>
+            <p id="appliedCouponDesc">You saved ₹120 on this order</p>
+          </div>
+          <button type="button" id="drawerRemoveCouponBtn" title="Remove coupon">&times;</button>
+        </div>
+      </div>
+
+      <!-- Detailed Bill Summary -->
+      <div class="bill-details-section">
+        <h4>Bill Details</h4>
+        <div class="bill-line">
+          <span>Item Total</span>
+          <span id="billItemTotal">₹0</span>
+        </div>
+        <div class="bill-line" id="billDiscountRow" style="display: none;">
+          <span>Discount Savings</span>
+          <span class="green-text" id="billDiscount">-₹0</span>
+        </div>
+        <div class="bill-line">
+          <span>Delivery Partner Fee</span>
+          <span id="billDeliveryFee">₹35</span>
+        </div>
+        <div class="bill-line">
+          <span>Delivery Tip</span>
+          <span id="billTip">₹20</span>
+        </div>
+        <div class="bill-line">
+          <span>Platform Fee</span>
+          <span id="billPlatformFee">₹5</span>
+        </div>
+        <div class="bill-line">
+          <span>Taxes & Restaurant Charges (5% GST)</span>
+          <span id="billTaxes">₹0</span>
+        </div>
+
+        <div class="bill-divider"></div>
+
+        <div class="bill-line total-line">
+          <strong>TO PAY</strong>
+          <strong class="total-amount" id="billGrandTotal">₹0</strong>
+        </div>
+
+        <div class="savings-congrats-pill" id="totalSavingsPill" style="display: none;">
+          🎉 You saved <strong id="totalSavingsAmount">₹150</strong> on this order!
+        </div>
+      </div>
+    </div>
+
+    <!-- Cart Actions -->
+    <div class="drawer-action-footer">
+      <button class="checkout-pay-btn" id="drawerProceedBtn">
+        <div class="btn-price-col">
+          <span class="btn-amt" id="drawerPayAmt">₹0</span>
+          <span class="btn-subtext">TOTAL</span>
+        </div>
+        <div class="btn-action-col">
+          <span>Proceed to Pay</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </div>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ================= CUSTOMIZATION BOTTOM SHEET / MODAL (Swiggy Item Options) ================= -->
+  <div class="modal-backdrop" id="dishCustomBackdrop">
+    <div class="modal-card customization-sheet" id="dishCustomSheet">
+      <button class="sheet-close-btn" id="closeCustomSheetBtn" aria-label="Close customization">&times;</button>
+
+      <div class="custom-sheet-header">
+        <div class="custom-dish-meta">
+          <span class="fssai-indicator" id="customSheetFssai"></span>
+          <h3 id="customSheetTitle">Paneer Butter Masala</h3>
+          <p class="custom-sheet-price" id="customSheetBasePrice">₹249</p>
+        </div>
+        <img src="" alt="" id="customSheetImg" class="custom-dish-thumb" />
+      </div>
+
+      <div class="custom-sheet-body">
+        <!-- Portion Options -->
+        <div class="options-group">
+          <div class="group-title-row">
+            <h4>Portion Size</h4>
+            <span class="badge-required">REQUIRED</span>
+          </div>
+          <div class="radio-options-list" id="customPortionOptions">
+            <label class="custom-radio-row">
+              <div class="radio-text">
+                <input type="radio" name="dishPortion" value="Regular" data-add="0" checked />
+                <span>Regular (Serves 1-2)</span>
+              </div>
+              <span class="opt-price">+₹0</span>
+            </label>
+            <label class="custom-radio-row">
+              <div class="radio-text">
+                <input type="radio" name="dishPortion" value="Full / Large" data-add="120" />
+                <span>Full Portion (Serves 2-3)</span>
+              </div>
+              <span class="opt-price">+₹120</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Add-on Extras -->
+        <div class="options-group">
+          <div class="group-title-row">
+            <h4>Add Extra Sides & Bread</h4>
+            <span class="badge-optional">OPTIONAL</span>
+          </div>
+          <div class="checkbox-options-list">
+            <label class="custom-checkbox-row">
+              <div class="check-text">
+                <input type="checkbox" name="dishAddon" value="Butter Garlic Naan" data-price="60" />
+                <span>Butter Garlic Naan (2 pcs)</span>
+              </div>
+              <span class="opt-price">+₹60</span>
+            </label>
+            <label class="custom-checkbox-row">
+              <div class="check-text">
+                <input type="checkbox" name="dishAddon" value="Extra Gravy & Raita" data-price="45" />
+                <span>Extra Gravy & Boondi Raita</span>
+              </div>
+              <span class="opt-price">+₹45</span>
+            </label>
+            <label class="custom-checkbox-row">
+              <div class="check-text">
+                <input type="checkbox" name="dishAddon" value="Roasted Papad & Chutney" data-price="30" />
+                <span>Roasted Papad & Mint Chutney</span>
+              </div>
+              <span class="opt-price">+₹30</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Cooking Note -->
+        <div class="options-group">
+          <label for="customCookingNote" class="group-label">Cooking Instructions</label>
+          <input type="text" id="customCookingNote" placeholder="e.g. Less spicy, send extra green chilies" />
+        </div>
+      </div>
+
+      <div class="custom-sheet-footer">
+        <div class="sheet-stepper">
+          <button type="button" id="sheetQtyMinus"><i class="fa-solid fa-minus"></i></button>
+          <span id="sheetQtyVal">1</span>
+          <button type="button" id="sheetQtyPlus"><i class="fa-solid fa-plus"></i></button>
+        </div>
+        <button class="sheet-add-btn" id="sheetAddToCartBtn">
+          <span>Add Item</span>
+          <span id="sheetAddTotal">₹249</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= SWIGGY / ZOMATO CHECKOUT MODAL ================= -->
+  <div class="modal-backdrop" id="checkoutModalBackdrop">
+    <div class="modal-card swiggy-checkout-card" id="checkoutModal">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <i class="fa-solid fa-shield-halved text-green"></i>
+          <h3>Review Order & Pay</h3>
+        </div>
+        <button class="modal-close-btn" id="closeCheckoutBtn">&times;</button>
+      </div>
+
+      <form id="checkoutForm" class="swiggy-checkout-form">
+        <!-- Step 1: Customer Account Info (Logged In vs Guest) -->
+        <div class="checkout-user-container" id="checkoutUserContainer">
+          <!-- Dynamically populated via JS: shows user's name/phone if logged in, or name/phone inputs if guest -->
+        </div>
+
+        <!-- Step 2: Order Items Summary & Restaurant Review (Exactly like Swiggy & Zomato) -->
+        <div class="checkout-step-box checkout-order-review-box">
+          <div class="step-label-row">
+            <span class="step-num"><i class="fa-solid fa-utensils"></i></span>
+            <div style="flex: 1;">
+              <h4 id="checkoutRestTitle">Delivering from Meghana Foods</h4>
+              <small id="checkoutRestLocality">Fast Delivery • 22 mins</small>
+            </div>
+            <span class="items-count-badge" id="checkoutItemsBadge">0 Items</span>
+          </div>
+
+          <div class="checkout-items-review-list" id="checkoutItemsReviewList">
+            <!-- Dynamically populated via renderCheckoutItems() -->
+          </div>
+
+          <!-- Mini Bill Preview inside Checkout -->
+          <div class="checkout-bill-preview" id="checkoutBillPreview">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- Step 3: Delivery Address Selector -->
+        <div class="checkout-step-box">
+          <div class="step-label-row">
+            <span class="step-num">1</span>
+            <h4>Delivery Address</h4>
+          </div>
+          <div class="address-cards-row" id="checkoutAddressCards">
+            <label class="addr-card active">
+              <input type="radio" name="deliveryAddressType" value="Current" checked />
+              <div class="addr-card-content">
+                <div class="addr-type-header"><i class="fa-solid fa-location-crosshairs text-primary"></i> <strong>Current Location</strong></div>
+                <p id="checkoutCurrentAreaText">Indiranagar, 100 Feet Rd, Bengaluru</p>
+                <small id="checkoutContactPhone">Contact: You</small>
+              </div>
+            </label>
+            <label class="addr-card">
+              <input type="radio" name="deliveryAddressType" value="Home" />
+              <div class="addr-card-content">
+                <div class="addr-type-header"><i class="fa-solid fa-house"></i> <strong>Home</strong></div>
+                <p>Flat 402, Royal Palms, 12th Main, Bengaluru</p>
+                <small>Saved Home</small>
+              </div>
+            </label>
+            <label class="addr-card">
+              <input type="radio" name="deliveryAddressType" value="Work" />
+              <div class="addr-card-content">
+                <div class="addr-type-header"><i class="fa-solid fa-briefcase"></i> <strong>Work / Office</strong></div>
+                <p>Tech Park, 4th Floor, CV Raman Nagar, Bengaluru</p>
+                <small>Office Hours</small>
+              </div>
+            </label>
+          </div>
+
+          <!-- Flat / House Number Specifics -->
+          <div class="checkout-flat-row">
+            <i class="fa-solid fa-door-closed text-muted"></i>
+            <input type="text" id="checkoutFlatNo" placeholder="House / Flat No., Floor, Landmark (e.g. Flat 301, 3rd Floor)" />
+          </div>
+        </div>
+
+        <!-- Step 4: Payment Method Options -->
+        <div class="checkout-step-box">
+          <div class="step-label-row">
+            <span class="step-num">2</span>
+            <h4>Select Payment Method</h4>
+          </div>
+
+          <div class="payment-methods-grid">
+            <label class="pay-method-card active">
+              <input type="radio" name="checkoutPayment" value="UPI" checked />
+              <div class="pay-card-inner">
+                <div class="pay-brand-icon upi-icon">
+                  <i class="fa-solid fa-mobile-screen-button"></i>
+                </div>
+                <div style="flex: 1;">
+                  <strong>Instant UPI Payment</strong>
+                  <small>Google Pay, PhonePe, Paytm, CRED UPI</small>
+                </div>
+                <span class="pay-fast-badge"><i class="fa-solid fa-bolt"></i> Fastest</span>
+              </div>
+            </label>
+
+            <label class="pay-method-card">
+              <input type="radio" name="checkoutPayment" value="Card" />
+              <div class="pay-card-inner">
+                <div class="pay-brand-icon card-icon">
+                  <i class="fa-regular fa-credit-card"></i>
+                </div>
+                <div>
+                  <strong>Credit / Debit Card</strong>
+                  <small>Visa, Mastercard, RuPay, Amex</small>
+                </div>
+              </div>
+            </label>
+
+            <label class="pay-method-card">
+              <input type="radio" name="checkoutPayment" value="COD" />
+              <div class="pay-card-inner">
+                <div class="pay-brand-icon cod-icon">
+                  <i class="fa-solid fa-hand-holding-dollar"></i>
+                </div>
+                <div>
+                  <strong>Cash on Delivery</strong>
+                  <small>Pay cash or scan QR upon arrival</small>
+                </div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Order Summary Strip -->
+        <div class="checkout-final-strip">
+          <div class="final-amt-col">
+            <small>Amount to Pay</small>
+            <strong id="checkoutFinalAmount">₹0</strong>
+          </div>
+          <button type="submit" class="place-order-submit-btn" id="placeOrderSubmitBtn">
+            <span>Pay & Place Order</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= SWIGGY / ZOMATO LIVE MAP ORDER TRACKER MODAL ================= -->
+  <div class="modal-backdrop" id="trackerModalBackdrop">
+    <div class="modal-card swiggy-tracker-card" id="trackerModal">
+      <button class="sheet-close-btn" id="closeTrackerBtn">&times;</button>
+
+      <!-- Customer Account Header (Prominently shows User Account & Order ID) -->
+      <div class="tracker-customer-card" id="trackerCustomerCard">
+        <div class="tracker-cust-avatar-col">
+          <div class="cust-avatar-circle" id="trackerCustInitial">U</div>
+        </div>
+        <div class="tracker-cust-info-col">
+          <div class="cust-row-top">
+            <span class="cust-label">ORDER PLACED BY</span>
+            <span class="order-id-tag" id="trackerOrderIdDisplay">CB-98214</span>
+          </div>
+          <h3 class="cust-name-heading" id="trackerCustomerName">Your Account</h3>
+          <div class="cust-meta-row">
+            <span id="trackerCustomerPhone"><i class="fa-solid fa-phone"></i> +91 98765 43210</span>
+            <span class="meta-dot">•</span>
+            <span id="trackerCustomerAddress"><i class="fa-solid fa-location-dot"></i> Indiranagar, Bengaluru</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Map Simulation Canvas/Graphic -->
+      <div class="live-map-header">
+        <div class="map-illustration">
+          <div class="map-road-path" id="mapRoadPath">
+            <div class="map-road-progress" id="mapRoadProgress"></div>
+            <div class="map-pulse-restaurant" title="Restaurant">
+              <i class="fa-solid fa-store"></i>
+            </div>
+            <div class="map-animated-scooter" id="mapScooter">
+              <i class="fa-solid fa-motorcycle"></i>
+            </div>
+            <div class="map-pulse-home" title="Your Home">
+              <i class="fa-solid fa-house"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="map-live-status-card">
+          <div class="live-pulse-dot"></div>
+          <div style="flex: 1;">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
+              <h3 id="trackerStageHeading">Order Placed & Accepted</h3>
+              <button class="fast-forward-btn" id="trackerFastForwardBtn" type="button" title="Fast-forward to next live delivery stage">
+                <i class="fa-solid fa-forward-step"></i> Next Stage
+              </button>
+            </div>
+            <p id="trackerStageSub">The restaurant has confirmed your order ticket.</p>
+          </div>
+          <div class="live-eta-badge">
+            <span class="eta-mins" id="liveEtaMins">26</span>
+            <small>MINS</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="tracker-card-body">
+        <!-- 4-Stage Progress Stepper -->
+        <div class="sw-stepper">
+          <div class="sw-step completed" id="swStep1">
+            <div class="sw-step-dot"><i class="fa-solid fa-check"></i></div>
+            <span>Order Placed</span>
+            <small class="step-time" id="swStepTime1">Confirmed</small>
+          </div>
+          <div class="sw-step active" id="swStep2">
+            <div class="sw-step-dot"><i class="fa-solid fa-fire-burner"></i></div>
+            <span>Food Preparing</span>
+            <small class="step-time" id="swStepTime2">In Kitchen</small>
+          </div>
+          <div class="sw-step" id="swStep3">
+            <div class="sw-step-dot"><i class="fa-solid fa-motorcycle"></i></div>
+            <span>On The Way</span>
+            <small class="step-time" id="swStepTime3">Estimated</small>
+          </div>
+          <div class="sw-step" id="swStep4">
+            <div class="sw-step-dot"><i class="fa-solid fa-bag-shopping"></i></div>
+            <span>Delivered</span>
+            <small class="step-time" id="swStepTime4">At Door</small>
+          </div>
+        </div>
+
+        <!-- Delivered Celebration & Rating Card (Appears dynamically upon delivery) -->
+        <div class="delivered-celebration-card" id="trackerDeliveredCard" style="display: none;">
+          <div class="delivered-banner-top">
+            <i class="fa-solid fa-circle-check delivered-check-icon"></i>
+            <div>
+              <h4>Order Delivered Safely!</h4>
+              <p>Hot, hygienic & contactless delivery complete. Bon Appétit! 🎉</p>
+            </div>
+          </div>
+          <div class="valet-rating-box">
+            <span>Rate your delivery experience with <strong>Ramesh Kumar</strong>:</span>
+            <div class="star-rating-row" id="valetStarRow">
+              <button type="button" class="star-btn active" data-rating="1"><i class="fa-solid fa-star"></i></button>
+              <button type="button" class="star-btn active" data-rating="2"><i class="fa-solid fa-star"></i></button>
+              <button type="button" class="star-btn active" data-rating="3"><i class="fa-solid fa-star"></i></button>
+              <button type="button" class="star-btn active" data-rating="4"><i class="fa-solid fa-star"></i></button>
+              <button type="button" class="star-btn active" data-rating="5"><i class="fa-solid fa-star"></i></button>
+            </div>
+            <div class="rating-feedback-chips">
+              <span class="fb-chip">⚡ Superfast Delivery</span>
+              <span class="fb-chip">🍲 Piping Hot Food</span>
+              <span class="fb-chip">🤝 Polite & Professional</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Delivery Partner Info Card (Clearly Designated as Assigned Valet) -->
+        <div class="delivery-partner-section">
+          <div class="delivery-partner-header-tag">
+            <i class="fa-solid fa-person-biking text-green"></i>
+            <span>YOUR DELIVERY PARTNER (ASSIGNED VALET)</span>
+          </div>
+          <div class="delivery-hero-card">
+            <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=150&q=80"
+              alt="Delivery Valet Ramesh" class="hero-rider-avatar" />
+            <div class="hero-rider-info">
+              <div class="rider-name-row">
+                <h4>Ramesh Kumar <span class="rider-valet-tag">Delivery Valet</span></h4>
+                <span class="verified-pill"><i class="fa-solid fa-shield-check"></i> Vaccinated</span>
+              </div>
+              <p><i class="fa-solid fa-star text-gold"></i> 4.9 Rating • 2,400+ deliveries • Electric Scooter</p>
+              <span class="distance-pill" id="riderDistancePill">⚡ Picking up your hot meal at restaurant</span>
+            </div>
+            <div class="rider-comm-buttons">
+              <button class="rider-btn" id="callRiderBtn" type="button" title="Call Delivery Partner">
+                <i class="fa-solid fa-phone"></i>
+                <span class="btn-sub-label">Call</span>
+              </button>
+              <button class="rider-btn" id="messageRiderBtn" type="button" title="Message Delivery Partner">
+                <i class="fa-solid fa-message"></i>
+                <span class="btn-sub-label">Chat</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Order Items Recap -->
+        <div class="tracker-order-recap">
+          <div class="recap-header">
+            <h4>Order Details (<span id="trackerRecapOrderId">CB-98214</span>)</h4>
+            <span class="paid-badge" id="trackerPaidMethod">Paid via UPI</span>
+          </div>
+          <div class="recap-items" id="trackerRecapItems">
+            <!-- Dynamically populated -->
+          </div>
+          <div class="recap-total-row">
+            <span>Total Paid</span>
+            <strong id="trackerRecapTotal">₹0</strong>
+          </div>
+        </div>
+
+        <div class="tracker-action-buttons" style="display: flex; gap: 0.75rem;">
+          <button class="btn btn-outline" id="viewInvoiceBtn" style="flex: 1;">
+            <i class="fa-solid fa-file-invoice"></i> Tax Invoice
+          </button>
+          <button class="btn btn-primary" id="closeTrackerDoneBtn" style="flex: 1;">
+            Browse More
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= RIDER CHAT MODAL ================= -->
+  <div class="modal-backdrop" id="riderChatModalBackdrop">
+    <div class="modal-card rider-chat-card" id="riderChatModal">
+      <div class="rider-chat-header">
+        <div class="rider-chat-valet-meta">
+          <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=150&q=80" alt="Valet Ramesh" class="chat-valet-img" />
+          <div>
+            <h4>Ramesh Kumar <span class="valet-online-badge"><i class="fa-solid fa-circle"></i> On Route</span></h4>
+            <small id="chatValetSub">Delivery Partner • Hero Electric Scooter</small>
+          </div>
+        </div>
+        <button class="sheet-close-btn" id="closeRiderChatBtn">&times;</button>
+      </div>
+
+      <div class="rider-chat-messages" id="riderChatMessages">
+        <!-- Injected via JS -->
+      </div>
+
+      <div class="rider-quick-replies" id="riderQuickReplies">
+        <button class="chat-chip" data-msg="Please don't ring the bell, thank you! 🔕">Don't ring bell 🔕</button>
+        <button class="chat-chip" data-msg="Please leave food at front door 🚪">Leave at door 🚪</button>
+        <button class="chat-chip" data-msg="Please call me once you reach the security gate 📞">Call at gate 📞</button>
+        <button class="chat-chip" data-msg="How much time will you take to reach? ⏱️">How much time? ⏱️</button>
+      </div>
+
+      <form class="rider-chat-input-bar" id="riderChatForm">
+        <input type="text" id="riderChatInput" placeholder="Message Ramesh..." autocomplete="off" />
+        <button type="submit" id="riderChatSendBtn"><i class="fa-solid fa-paper-plane"></i></button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= RIDER CALL SIMULATION MODAL ================= -->
+  <div class="modal-backdrop" id="riderCallModalBackdrop">
+    <div class="modal-card rider-call-card" id="riderCallModal">
+      <div class="call-pulse-rings">
+        <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=150&q=80" alt="Valet Ramesh" class="call-valet-avatar" />
+      </div>
+      <h3 class="call-valet-name">Ramesh Kumar</h3>
+      <p class="call-status-text" id="callStatusText">Connecting via CraveBite Secure Masking...</p>
+      <small class="call-number-sub">+91 98765 11002 • Delivery Partner</small>
+
+      <div class="call-action-row">
+        <button class="call-ctrl-btn mute-btn" id="callMuteBtn" title="Mute"><i class="fa-solid fa-microphone-slash"></i></button>
+        <button class="call-ctrl-btn hangup-btn" id="callHangupBtn" title="End Call"><i class="fa-solid fa-phone-slash"></i></button>
+        <button class="call-ctrl-btn speaker-btn" id="callSpeakerBtn" title="Speaker"><i class="fa-solid fa-volume-high"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= LOCATION SELECTOR MODAL ================= -->
+  <div class="modal-backdrop" id="locationModalBackdrop">
+    <div class="modal-card swiggy-loc-modal" id="locationModal">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <i class="fa-solid fa-location-dot text-primary"></i>
+          <h3>Choose Delivery Location</h3>
+        </div>
+        <button class="modal-close-btn" id="closeLocationBtn">&times;</button>
+      </div>
+      <div class="loc-modal-body">
+        <!-- Use Current Location (GPS) Button -->
+        <button class="use-gps-action-btn" id="useGpsBtn">
+          <div class="gps-icon-circle" id="gpsIconCircle">
+            <i class="fa-solid fa-crosshairs"></i>
+          </div>
+          <div class="gps-btn-text">
+            <strong>Use Current Location</strong>
+            <span id="gpsStatusSub">Using device GPS & browser geolocation</span>
+          </div>
+          <i class="fa-solid fa-chevron-right gps-arrow"></i>
+        </button>
+
+        <div class="loc-divider-or"><span>OR SEARCH MANUALLY</span></div>
+
+        <div class="search-container modal-search">
+          <i class="fa-solid fa-magnifying-glass search-icon"></i>
+          <input type="text" id="citySearchInput" placeholder="Search city, area or street..." />
+        </div>
+
+        <div class="saved-city-zones">
+          <h4>Popular Delivery Cities</h4>
+          <div class="city-chips-grid">
+            <button class="city-chip-btn active" data-city="Bengaluru" data-area="Indiranagar, 100 Feet Road">
+              <i class="fa-solid fa-building"></i>
+              <div>
+                <strong>Bengaluru</strong>
+                <small>Indiranagar, Koramangala, Whitefield</small>
+              </div>
+            </button>
+            <button class="city-chip-btn" data-city="Mumbai" data-area="Bandra West, Hill Road">
+              <i class="fa-solid fa-landmark"></i>
+              <div>
+                <strong>Mumbai</strong>
+                <small>Bandra, Andheri, South Bombay</small>
+              </div>
+            </button>
+            <button class="city-chip-btn" data-city="Delhi NCR" data-area="Connaught Place, Inner Circle">
+              <i class="fa-solid fa-monument"></i>
+              <div>
+                <strong>Delhi NCR</strong>
+                <small>Connaught Place, Gurgaon, Noida</small>
+              </div>
+            </button>
+            <button class="city-chip-btn" data-city="Hyderabad" data-area="Jubilee Hills, Road No. 36">
+              <i class="fa-solid fa-gem"></i>
+              <div>
+                <strong>Hyderabad</strong>
+                <small>Jubilee Hills, Hitec City, Banjara Hills</small>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= OFFERS MODAL ================= -->
+  <div class="modal-backdrop" id="offersModalBackdrop">
+    <div class="modal-card offers-modal-card" id="offersModal">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <i class="fa-solid fa-tags text-primary"></i>
+          <h3>Available Coupons & Bank Offers</h3>
+        </div>
+        <button class="modal-close-btn" id="closeOffersBtn">&times;</button>
+      </div>
+      <div class="offers-list-container">
+        <div class="coupon-deal-item" onclick="applyCouponDirectly('CRAVE50')">
+          <div class="coupon-badge-strip">50% OFF</div>
+          <div class="coupon-deal-details">
+            <h4>Code: CRAVE50</h4>
+            <p>Get 50% discount up to ₹150 on your order. Valid on orders above ₹249.</p>
+          </div>
+          <button class="copy-coupon-btn">APPLY</button>
+        </div>
+
+        <div class="coupon-deal-item" onclick="applyCouponDirectly('FREEDEL')">
+          <div class="coupon-badge-strip">FREE SHIP</div>
+          <div class="coupon-deal-details">
+            <h4>Code: FREEDEL</h4>
+            <p>100% Free delivery on all gourmet orders above ₹199.</p>
+          </div>
+          <button class="copy-coupon-btn">APPLY</button>
+        </div>
+
+        <div class="coupon-deal-item" onclick="applyCouponDirectly('FLAT100')">
+          <div class="coupon-badge-strip">FLAT ₹100</div>
+          <div class="coupon-deal-details">
+            <h4>Code: FLAT100</h4>
+            <p>Instant flat ₹100 discount on Biryani and Family packs.</p>
+          </div>
+          <button class="copy-coupon-btn">APPLY</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= PAST ORDERS MODAL ================= -->
+  <div class="modal-backdrop" id="ordersModalBackdrop">
+    <div class="modal-card orders-modal-card" id="ordersModal">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <i class="fa-solid fa-clock-rotate-left text-primary"></i>
+          <h3>Your Past Orders</h3>
+        </div>
+        <button class="modal-close-btn" id="closeOrdersBtn">&times;</button>
+      </div>
+      <div class="orders-list-body" id="ordersListBody">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= USER LOGIN & SIGN UP MODAL ================= -->
+  <div class="modal-backdrop" id="authModalBackdrop">
+    <div class="modal-card auth-modal-card" id="authModal">
+      <button class="modal-close-btn" id="closeAuthBtn">&times;</button>
+
+      <div class="auth-header">
+        <div class="brand-badge" style="width: 48px; height: 48px; font-size: 1.4rem; margin: 0 auto 0.75rem;">
+          <i class="fa-solid fa-utensils"></i>
+        </div>
+        <h3 id="authModalTitle">Welcome to CraveBite</h3>
+        <p id="authModalSubtitle">Sign in or register to track orders, save addresses & access Crave Gold.</p>
+      </div>
+
+      <!-- Auth Tabs: Login vs Sign Up -->
+      <div class="auth-tabs-row">
+        <button class="auth-tab active" id="tabLoginBtn" type="button">Sign In</button>
+        <button class="auth-tab" id="tabSignUpBtn" type="button">Create Account</button>
+      </div>
+
+      <div class="auth-forms-container">
+        <!-- LOGIN FORM -->
+        <form id="loginForm" class="auth-form active">
+          <div class="form-group">
+            <label for="loginIdentifier">Email Address or Mobile Number</label>
+            <div class="input-icon-wrap">
+              <i class="fa-regular fa-envelope"></i>
+              <input type="text" id="loginIdentifier" placeholder="name@example.com or 10-digit mobile" required
+                autocomplete="username" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="loginPassword">Password</label>
+            <div class="input-icon-wrap">
+              <i class="fa-solid fa-lock"></i>
+              <input type="password" id="loginPassword" placeholder="Enter your password" required
+                autocomplete="current-password" />
+              <button type="button" class="eye-toggle-btn" id="toggleLoginPwd"><i
+                  class="fa-regular fa-eye"></i></button>
+            </div>
+          </div>
+
+          <div class="auth-extra-row">
+            <label class="remember-check">
+              <input type="checkbox" id="rememberMe" checked />
+              <span>Remember me</span>
+            </label>
+            <a href="#" class="forgot-link"
+              onclick="event.preventDefault(); alert('Password reset instructions sent to your registered email or phone!');">Forgot
+              Password?</a>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block auth-submit-btn" id="loginSubmitBtn">
+            <span>Sign In to Continue</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+
+          <!-- 1-Click Quick Demo Login Button -->
+          <div class="demo-login-box">
+            <button type="button" class="btn-demo-quick" id="quickDemoLoginBtn">
+              <i class="fa-solid fa-bolt text-gold"></i>
+              <span>One-Click Demo Login (as Rahul Sharma)</span>
+            </button>
+          </div>
+        </form>
+
+        <!-- SIGN UP FORM -->
+        <form id="signUpForm" class="auth-form" style="display: none;">
+          <div class="form-group">
+            <label for="signUpName">Full Name *</label>
+            <div class="input-icon-wrap">
+              <i class="fa-regular fa-user"></i>
+              <input type="text" id="signUpName" placeholder="e.g. Rahul Sharma" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="signUpEmail">Email Address *</label>
+            <div class="input-icon-wrap">
+              <i class="fa-regular fa-envelope"></i>
+              <input type="email" id="signUpEmail" placeholder="e.g. rahul@example.com" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="signUpPhone">Mobile Number *</label>
+            <div class="phone-input-wrap">
+              <span class="phone-prefix">+91</span>
+              <input type="tel" id="signUpPhone" placeholder="10-digit mobile number" maxlength="10" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="signUpPassword">Create Password *</label>
+            <div class="input-icon-wrap">
+              <i class="fa-solid fa-lock"></i>
+              <input type="password" id="signUpPassword" placeholder="Minimum 6 characters" minlength="6" required />
+              <button type="button" class="eye-toggle-btn" id="toggleSignUpPwd"><i
+                  class="fa-regular fa-eye"></i></button>
+            </div>
+          </div>
+
+          <label class="terms-check">
+            <input type="checkbox" id="agreeTerms" required checked />
+            <span>I agree to CraveBite's <a href="#" target="_blank">Terms & Conditions</a> and <a href="#"
+                target="_blank">Privacy Policy</a></span>
+          </label>
+
+          <button type="submit" class="btn btn-primary btn-block auth-submit-btn" id="signUpSubmitBtn">
+            <span>Send OTP & Verify Mobile</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </form>
+
+        <!-- OTP VERIFICATION VIEW -->
+        <div id="otpVerificationView" class="auth-otp-view" style="display: none;">
+          <div class="otp-phone-header">
+            <div class="otp-phone-icon">
+              <i class="fa-solid fa-mobile-screen-button"></i>
+              <span class="otp-check-bubble"><i class="fa-solid fa-shield-halved"></i></span>
+            </div>
+            <h4>Verify Mobile Number</h4>
+            <p>We've sent a 6-digit verification code to <strong id="otpDisplayPhone">+91 98765 43210</strong></p>
+            <button type="button" class="edit-phone-btn" id="editPhoneBtn">
+              <i class="fa-solid fa-pen-to-square"></i> Change Number
+            </button>
+          </div>
+
+          <!-- Simulated Live SMS Notification Banner -->
+          <div class="sms-notification-pill" id="smsNotificationPill">
+            <div class="sms-icon-box"><i class="fa-solid fa-comment-dots"></i></div>
+            <div class="sms-body">
+              <div class="sms-top">
+                <span>CraveBite Security</span>
+                <small>JUST NOW</small>
+              </div>
+              <p>Your registration OTP is <strong id="generatedOtpText">482916</strong>. Do not share this with anyone.
+              </p>
+            </div>
+            <button type="button" class="auto-fill-btn" id="autoFillOtpBtn" title="Auto-fill OTP">AUTO-FILL</button>
+          </div>
+
+          <!-- 6-digit OTP Inputs Row -->
+          <div class="otp-inputs-row" id="otpInputsRow">
+            <input type="text" maxlength="1" class="otp-digit" data-idx="0" inputmode="numeric"
+              autocomplete="one-time-code" />
+            <input type="text" maxlength="1" class="otp-digit" data-idx="1" inputmode="numeric" />
+            <input type="text" maxlength="1" class="otp-digit" data-idx="2" inputmode="numeric" />
+            <input type="text" maxlength="1" class="otp-digit" data-idx="3" inputmode="numeric" />
+            <input type="text" maxlength="1" class="otp-digit" data-idx="4" inputmode="numeric" />
+            <input type="text" maxlength="1" class="otp-digit" data-idx="5" inputmode="numeric" />
+          </div>
+
+          <div class="otp-timer-row">
+            <span id="otpTimerText">Resend code in <strong id="otpTimerCount">30</strong>s</span>
+            <button type="button" class="resend-otp-btn" id="resendOtpBtn" style="display: none;">Resend OTP</button>
+          </div>
+
+          <button type="button" class="btn btn-primary btn-block auth-submit-btn" id="verifyOtpSubmitBtn">
+            <span>Verify & Complete Registration</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="auth-footer-prompt">
+        <span id="authSwitchPrompt">Don't have an account yet?</span>
+        <button type="button" class="auth-switch-link" id="authSwitchLink">Create one now</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= OFFICIAL TAX INVOICE MODAL (RECEIPT) ================= -->
+  <div class="modal-backdrop" id="invoiceModalBackdrop">
+    <div class="modal-card invoice-modal-card" id="invoiceModal">
+      <div class="invoice-toolbar no-print">
+        <button class="btn btn-primary btn-sm" id="printInvoiceBtn">
+          <i class="fa-solid fa-print"></i> Print / Save as PDF
+        </button>
+        <button class="modal-close-btn" id="closeInvoiceBtn">&times;</button>
+      </div>
+
+      <div class="invoice-paper" id="invoicePaper">
+        <div class="invoice-header">
+          <div class="invoice-brand">
+            <h2>crave<span>bite</span></h2>
+            <p>Instant Food Delivery Partner</p>
+          </div>
+          <div class="invoice-title-meta">
+            <h3>TAX INVOICE</h3>
+            <span class="inv-id" id="invOrderId">Order #CB-98214</span>
+            <small id="invDateTime">11 Nov 2026, 01:45 PM</small>
+          </div>
+        </div>
+
+        <div class="invoice-info-grid">
+          <div class="inv-col">
+            <strong>RESTAURANT DETAILS</strong>
+            <p id="invRestName">Meghana Foods</p>
+            <p id="invRestAddress">100 Feet Road, Indiranagar, Bengaluru</p>
+            <small>FSSAI Lic: 10019022009823</small><br />
+            <small>GSTIN: 29AABCM1234F1Z5</small>
+          </div>
+          <div class="inv-col">
+            <strong>DELIVERED TO</strong>
+            <p id="invCustomerName">Rahul Sharma</p>
+            <p id="invCustomerAddress">Indiranagar, Bengaluru</p>
+            <small id="invCustomerPhone">Phone: +91 98765 43210</small><br />
+            <small id="invPayMode">Payment Mode: UPI Verified</small>
+          </div>
+        </div>
+
+        <!-- Items Table -->
+        <table class="invoice-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Item Description</th>
+              <th>Portion</th>
+              <th class="text-right">Qty</th>
+              <th class="text-right">Price</th>
+              <th class="text-right">Amount</th>
+            </tr>
+          </thead>
+          <tbody id="invoiceItemsTbody">
+            <!-- Dynamic rows -->
+          </tbody>
+        </table>
+
+        <!-- Totals Summary -->
+        <div class="invoice-totals-wrapper">
+          <div class="inv-totals-box">
+            <div class="inv-line"><span>Item Subtotal:</span> <span id="invItemSubtotal">₹0</span></div>
+            <div class="inv-line green-text" id="invDiscountLine"><span>Coupon Discount:</span> <span
+                id="invDiscountAmount">-₹0</span></div>
+            <div class="inv-line"><span>Delivery Partner Fee:</span> <span id="invDeliveryFee">₹0</span></div>
+            <div class="inv-line"><span>Delivery Partner Tip:</span> <span id="invRiderTip">₹0</span></div>
+            <div class="inv-line"><span>Platform Convenience Fee:</span> <span id="invPlatformFee">₹5</span></div>
+            <div class="inv-line"><span>GST (5% SGST 2.5% + CGST 2.5%):</span> <span id="invGst">₹0</span></div>
+            <div class="inv-divider"></div>
+            <div class="inv-line grand-total">S
+              <strong>TOTAL PAID:</strong>
+              <strong id="invGrandTotal">₹0</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="invoice-footer-note">
+          <p>This is a computer-generated tax invoice and does not require a physical signature.</p>
+          <p>Thank you for ordering with CraveBite. FSSAI certified & hygienic.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <!-- JavaScript -->
+  <script src="script.js?v=3.0"></script>
+</body>
+
+</html>
