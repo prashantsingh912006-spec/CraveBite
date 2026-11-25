@@ -91,3 +91,16 @@ A modern food delivery web application rebuilt with the iconic design patterns, 
   ```powershell
   python -m http.server 8000
   ```
+## 📸 Website Screenshots
+
+### Homepage
+![Homepage](screenshots/homepage.png)
+
+### Restaurants
+![Restaurants](screenshots/restaurants.png)
+
+### Cart & Checkout
+![Cart and Checkout](screenshots/cart-checkout.png)
+
+### Order Tracking
+![Order Tracking](screenshots/order-tracking.png)
